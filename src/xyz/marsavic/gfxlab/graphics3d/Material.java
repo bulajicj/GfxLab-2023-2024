@@ -3,7 +3,7 @@ package xyz.marsavic.gfxlab.graphics3d;
 import xyz.marsavic.functions.F1;
 import xyz.marsavic.geometry.Vector;
 import xyz.marsavic.gfxlab.Color;
-
+import xyz.marsavic.gfxlab.graphics3d.textures.ImageTexture;
 
 public record Material (
 		Color diffuse,
@@ -14,21 +14,25 @@ public record Material (
 		double refractiveIndex,
 		
 		Color emittance,
-		BSDF bsdf
+		BSDF bsdf,
+		ImageTexture diffuseTexture,
+		ImageTexture normalMap
 ) implements F1<Material, Vector> {
 	
-	public Material diffuse        (Color  diffuse        ) { return new Material(diffuse, specular, shininess, reflective, refractive, refractiveIndex, emittance); }
-	public Material specular       (Color  specular       ) { return new Material(diffuse, specular, shininess, reflective, refractive, refractiveIndex, emittance); }
-	public Material shininess      (double shininess      ) { return new Material(diffuse, specular, shininess, reflective, refractive, refractiveIndex, emittance); }
-	public Material reflective     (Color  reflective     ) { return new Material(diffuse, specular, shininess, reflective, refractive, refractiveIndex, emittance); }
-	public Material refractive     (Color  refractive     ) { return new Material(diffuse, specular, shininess, reflective, refractive, refractiveIndex, emittance); }
-	public Material refractiveIndex(double refractiveIndex) { return new Material(diffuse, specular, shininess, reflective, refractive, refractiveIndex, emittance); }
-	public Material emittance      (Color  emittance      ) { return new Material(diffuse, specular, shininess, reflective, refractive, refractiveIndex, emittance); }
-	
+	public Material diffuse        (Color  diffuse        ) { return new Material(diffuse, specular, shininess, reflective, refractive, refractiveIndex, emittance, diffuseTexture, normalMap); }
+	public Material specular       (Color  specular       ) { return new Material(diffuse, specular, shininess, reflective, refractive, refractiveIndex, emittance, diffuseTexture, normalMap); }
+	public Material shininess      (double shininess      ) { return new Material(diffuse, specular, shininess, reflective, refractive, refractiveIndex, emittance, diffuseTexture, normalMap); }
+	public Material reflective     (Color  reflective     ) { return new Material(diffuse, specular, shininess, reflective, refractive, refractiveIndex, emittance, diffuseTexture, normalMap); }
+	public Material refractive     (Color  refractive     ) { return new Material(diffuse, specular, shininess, reflective, refractive, refractiveIndex, emittance, diffuseTexture, normalMap); }
+	public Material refractiveIndex(double refractiveIndex) { return new Material(diffuse, specular, shininess, reflective, refractive, refractiveIndex, emittance, diffuseTexture, normalMap); }
+	public Material emittance      (Color  emittance      ) { return new Material(diffuse, specular, shininess, reflective, refractive, refractiveIndex, emittance, diffuseTexture, normalMap); }
+	public Material diffuseTexture (ImageTexture diffuseTexture) { return  new Material(diffuse, specular, shininess, reflective, refractive, refractiveIndex, emittance, diffuseTexture, normalMap);}
+	public Material normalMap (ImageTexture normalMap) { return  new Material(diffuse, specular, shininess, reflective, refractive, refractiveIndex, emittance,diffuseTexture, normalMap);}
 	public Material specularCopyDiffuse() { return this.specular(diffuse()); }
+
+
 	
-	
-	public Material(Color diffuse, Color specular, double shininess, Color reflective, Color refractive, double refractiveIndex, Color emittance) {
+	public Material(Color diffuse, Color specular, double shininess, Color reflective, Color refractive, double refractiveIndex, Color emittance, ImageTexture diffuseTexture, ImageTexture normalMap) {
 		this(diffuse, specular, shininess, reflective, refractive, refractiveIndex, emittance,
 				BSDF.avg(
 						new BSDF[] {
@@ -41,13 +45,15 @@ public record Material (
 								reflective.luminance(),
 								refractive.luminance()
 						}
-				)
+				),
+				diffuseTexture,
+				normalMap
 		);
 	}
 	
 	
 	public Material(BSDF bsdf) {
-		this(Color.BLACK, Color.BLACK, 32.0, Color.BLACK, Color.BLACK, 1.4, Color.BLACK, bsdf);
+		this(Color.BLACK, Color.BLACK, 32.0, Color.BLACK, Color.BLACK, 1.4, Color.BLACK, bsdf, null, null);
 	}
 	
 	
@@ -55,11 +61,9 @@ public record Material (
 	public Material at(Vector uv) {
 		return this;
 	}
-	
-	
 	// --- Utility constants and factory methods ---
 	
-	public static final Material BLACK   = new Material(Color.BLACK, Color.BLACK, 32, Color.BLACK, Color.BLACK, 1.5, Color.BLACK);
+	public static final Material BLACK   = new Material(Color.BLACK, Color.BLACK, 32, Color.BLACK, Color.BLACK, 1.5, Color.BLACK, null, null);
 	
 	public static Material matte (Color  c) { return BLACK.diffuse(c); }
 	public static Material matte (double k) { return matte(Color.gray(k)); }
@@ -94,7 +98,9 @@ public record Material (
 				refractive     .mul(k),
 				refractiveIndex   * k ,
 				emittance      .mul(k),
-				bsdf           .mul(k)
+				bsdf           .mul(k),
+				diffuseTexture,
+				normalMap
 		);
 	}
 	
@@ -107,7 +113,9 @@ public record Material (
 				refractive     .add(o.refractive     ),
 				refractiveIndex   + o.refractiveIndex ,
 				emittance      .add(o.emittance      ),
-				BSDF.avg(new BSDF[] {this.bsdf, o.bsdf}, new double[] {1, 1})
+				BSDF.avg(new BSDF[] {this.bsdf, o.bsdf}, new double[] {1, 1}),
+				diffuseTexture,
+				normalMap
 		);
 	}
 	

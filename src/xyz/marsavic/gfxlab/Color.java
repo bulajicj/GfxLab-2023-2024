@@ -15,9 +15,20 @@ public class Color {
 	
 	
 	final double r, g, b;
- 
- 
- 
+
+	public double getR() {
+		return r;
+	}
+
+	public double getG() {
+		return g;
+	}
+
+	public double getB() {
+		return b;
+	}
+
+
 	private Color(double r, double g, double b) {
 		this.r = r;
 		this.g = g;

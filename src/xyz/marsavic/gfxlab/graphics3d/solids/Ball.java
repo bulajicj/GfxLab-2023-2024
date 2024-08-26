@@ -7,7 +7,7 @@ import xyz.marsavic.gfxlab.graphics3d.Hit;
 import xyz.marsavic.gfxlab.graphics3d.Material;
 import xyz.marsavic.gfxlab.graphics3d.Ray;
 import xyz.marsavic.gfxlab.graphics3d.Solid;
-import xyz.marsavic.utils.Numeric;
+import xyz.marsavic.gfxlab.graphics3d.textures.ImageTexture;
 
 
 public class Ball implements Solid {
@@ -74,30 +74,78 @@ public class Ball implements Solid {
 			super(ray, t);
 		}
 		
-		@Override
+		/*@Override
 		public Vec3 n() {
 			return ray().at(t()).sub(c());
+		}*/
+
+		/*@Override
+		public Vec3 n_() {
+			return n().div(r);
+		}*/
+
+		// Method to get the normal from the normal map if available
+		@Override
+		public Vec3 n_() {
+			// This is the geometric normal at the hit point on the sphere.
+			Vec3 normal = n();//ray().at(t()).sub(c()).div(r).normalized_();
+
+			// Compute UV coordinates directly from the normal
+			Vector uv = computeUV(normal);
+
+			// Sample the normal map using the UV coordinates
+			Vec3 normalMapSample = getNormalFromTexture(uv);
+
+			// The sampled normal map is typically in tangent space, so we need to transform it
+			// to world space. For this, we calculate the tangent and bitangent vectors.
+			Vec3 tangent = Vec3.xyz(-normal.z(), 0, normal.x()).normalized_(); // Tangent vector
+			Vec3 bitangent = normal.cross(tangent).normalized_(); // Bitangent vector
+
+			// Convert the normal map sample from tangent space to world space
+			return tangent.mul(normalMapSample.x())
+					.add(bitangent.mul(normalMapSample.y()))
+					.add(normal.mul(normalMapSample.z()))
+					.normalized_();
+
 		}
-		
+
+		private Vec3 getNormalFromTexture(Vector uv) {
+
+			Material material = mapMaterial.at(uv);
+			ImageTexture normalMapTexture = material.normalMap();
+
+			if (normalMapTexture != null) {
+				return normalMapTexture.sampleNormal(uv);
+			} else {
+				// Return the geometric normal if no normal map is present
+				return Vec3.EZ;
+			}
+		}
+
+		// Helper method to compute UV coordinates directly from the normal
+		private Vector computeUV(Vec3 normal) {
+			double u = 0.5 + Math.atan2(normal.z(), normal.x()) / (2 * Math.PI);
+			double v = 0.5 - Math.asin(normal.y()) / Math.PI;
+			return Vector.xy(u, v);
+		}
+
+		@Override
+		public Vec3 n() {
+			// This is the geometric normal at the hit point on the sphere.
+			return ray().at(t()).sub(c()).div(r).normalized_();
+		}
+
 		@Override
 		public Material material() {
 			return Ball.this.mapMaterial.at(uv());
 		}
-		
+
 		@Override
 		public Vector uv() {
-			Vec3 n = n();
-			return Vector.xy(
-					Numeric.atan2T(n.z(), n.x()),
-					4 * Numeric.asinT(n.y() / r)
-			);
+			Vec3 n = n().normalized_();
+			double u = 0.5 + Math.atan2(n.z(), n.x()) / (2 * Math.PI);
+			double v = 0.5 - Math.asin(n.y()) / Math.PI;
+			return Vector.xy(u, v);
 		}
-		
-		@Override
-		public Vec3 n_() {
-			return n().div(r);
-		}
-		
 	}
-	
 }

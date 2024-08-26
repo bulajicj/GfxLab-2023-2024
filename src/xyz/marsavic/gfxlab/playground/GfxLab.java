@@ -6,10 +6,8 @@ import xyz.marsavic.gfxlab.*;
 import xyz.marsavic.gfxlab.aggregation.EAggregator;
 import xyz.marsavic.gfxlab.graphics3d.Affine;
 import xyz.marsavic.gfxlab.graphics3d.cameras.Perspective;
-import xyz.marsavic.gfxlab.graphics3d.cameras.ThinLensFOV;
 import xyz.marsavic.gfxlab.graphics3d.cameras.TransformedCamera;
 import xyz.marsavic.gfxlab.graphics3d.raytracing.Pathtracer;
-import xyz.marsavic.gfxlab.graphics3d.raytracing.RaytracerSimple;
 import xyz.marsavic.gfxlab.graphics3d.scenes.*;
 import xyz.marsavic.gfxlab.gui.UtilsGL;
 import xyz.marsavic.gfxlab.tonemapping.ColorTransform;
@@ -31,7 +29,18 @@ public class GfxLab {
 				e(Fs::frFrameToneMapping,
 						new EAggregator(
 								e(Fs::transformedColorFunction,
-										e(RaytracerSimple::new, // Shadows are currently turned off to simplify rendering of SDF solids.
+										e(Pathtracer::new,
+												e(BallScene::new),
+												e(TransformedCamera::new,
+														e(Perspective::new, e(1.0/3)),
+														e(Affine.IDENTITY
+																.then(Affine.translation(Vec3.xyz(0, 0, -5)))
+														)
+												),
+												e(16)
+										),
+
+								/*		e(RaytracerSimple::new, // Shadows are currently turned off to simplify rendering of SDF solids.
 												e(TestSDF::new),
 												e(TransformedCamera::new,
 														e(Perspective::new, e(0.5)),
@@ -39,7 +48,7 @@ public class GfxLab {
 																.then(Affine.translation(Vec3.xyz(0, 0, -3)))
 														)
 												)
-										),
+										),*/
 /*
 										e(Pathtracer::new,
 												e(ChristmasTree::new),
@@ -59,7 +68,7 @@ public class GfxLab {
 						),
 						e(Fs::frToneMapping,
 //								e(ColorTransform::asColorTransformFromMatrixColor, e(new Identity()))
-								e(AutoSoft::new)
+								e(AutoSoft::new, e(0x1p-4), e(1.0))
 						)
 				);
 	}
