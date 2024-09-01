@@ -23,10 +23,10 @@ public class BallScene extends Scene.Base {
         var materialUVWalls  = Grid.standard(Color.WHITE);
         var materialUVWallsL = Grid.standard(Color.hsb(0.00, 0.5, 1.0));
         var materialUVWallsR = Grid.standard(Color.hsb(0.33, 0.5, 1.0));
-        var floorTexture = new ImageTexture("/xyz/marsavic/gfxlab/graphics3d/textures/images/wooden-floor.jpg");
-        /*if (floorTexture == null) {
-            throw new RuntimeException("Texture could not be loaded. Check file path: /xyz/marsavic/gfxlab/graphics3d/textures/wooden-floor.jpg");
-        }*/
+        var floorTexture = new ImageTexture("/images/textures/wooden-floor.jpg");
+        if (floorTexture == null) {
+            throw new RuntimeException("Texture could not be loaded. Check file path: /images/textures/wooden-floor.jpg");
+        }
 
 
         Collection<Solid> solids = new ArrayList<>();
@@ -39,21 +39,21 @@ public class BallScene extends Scene.Base {
         );
 
         // Load the textures
-        //var texture = new ImageTexture("/xyz/marsavic/gfxlab/graphics3d/textures/images/blue-texture.jpg");
-        //var texture = new ImageTexture("/xyz/marsavic/gfxlab/graphics3d/textures/images/denim-texture.jpg");
-       // var texture = new ImageTexture("/xyz/marsavic/gfxlab/graphics3d/textures/brick-wall.jpg");
-        var texture = new ImageTexture("/xyz/marsavic/gfxlab/graphics3d/textures/images/denim-texture.jpg");
-        /*if (texture == null) {
-            throw new RuntimeException("Normal map could not be loaded. Check file path: /xyz/marsavic/gfxlab/graphics3d/textures/images/denim-texture.jpg");
-        }*/
+        //var texture = new ImageTexture("/images/textures/blue-texture.jpg");
+        //var texture = new ImageTexture("/images/textures/denim-texture.jpg");
+        //var texture = new ImageTexture("/images/textures/brick-wall.jpg");
+        var texture = new ImageTexture("/images/textures/denim-texture.jpg");
+        if (texture == null) {
+            throw new RuntimeException("Normal map could not be loaded. Check file path: /images/textures/denim-texture.jpg");
+        }
 
         //Load the normalMaps
-        //ImageTexture normalMapTexture = new ImageTexture("/xyz/marsavic/gfxlab/graphics3d/textures/normalMaps/NormalMap3.jpg");
-        //ImageTexture normalMapTexture = new ImageTexture("/xyz/marsavic/gfxlab/graphics3d/textures/normalMaps/NormalMap6.jpg");
-        ImageTexture normalMapTexture = new ImageTexture("/xyz/marsavic/gfxlab/graphics3d/textures/normalMaps/NormalMap.jpg");
-        /*if (normalMapTexture == null) {
-            throw new RuntimeException("Normal map could not be loaded. Check file path: /xyz/marsavic/gfxlab/graphics3d/textures/normalMaps/NormalMap.jpg");
-        }*/
+        //ImageTexture normalMapTexture = new ImageTexture("/images/normalMaps/NormalMap3.jpg");
+        //ImageTexture normalMapTexture = new ImageTexture("/images/normalMaps/NormalMap6.jpg");
+        ImageTexture normalMapTexture = new ImageTexture("/images/normalMaps/NormalMap.jpg");
+        if (normalMapTexture == null) {
+            throw new RuntimeException("Normal map could not be loaded. Check file path: /images/normalMaps/NormalMap.jpg");
+        }
 
         //Applying textures with normal maps
         F1<Material, Vector> material = (Vector uv) -> {
